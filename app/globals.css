@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand: #1A1A1A;
+    --brand-light: #3D3D3D;
+    --brand-dark: #0A0A0A;
+    --brand-50: #F5F5F5;
+    --accent: #C9973F;
+    --accent-light: #E0B96A;
+    --accent-dark: #9A6E25;
+    --bg: #FFFFFF;
+    --surface: #FAFAFA;
+    --surface-alt: #F5F5F5;
+    --text: #1A1A1A;
+    --text-muted: #6B7280;
+    --border: #E5E7EB;
+    --border-strong: #C9973F;
+    --success: #10B981;
+    --warning: #F59E0B;
+    --error: #EF4444;
+    --radius: 12px;
+  }
+
+  body {
+    @apply bg-background text-gray-900 font-sans antialiased max-w-[480px] mx-auto min-h-screen relative shadow-2xl shadow-black/5;
+  }
+}
+
+@layer components {
+  /* Legacy classes temporarily kept for compatibility until components are refactored */
+  .btn-brand {
+    @apply bg-brand text-white rounded-xl py-3.5 px-6 font-semibold text-[15px] w-full transition-colors active:bg-brand-dark hover:bg-brand-light;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow;
+  }
+
+  .badge {
+    @apply bg-brand text-white rounded-full py-0.5 px-2 text-[11px] font-semibold;
+  }
+
+  .badge-sale {
+    @apply bg-red-500 text-white rounded-full py-0.5 px-2 text-[11px] font-semibold;
+  }
+}
+
+/* Glassmorphism utilities */
+.glass {
+  @apply bg-white/80 backdrop-blur-md border-b border-white/20;
+}
+
+.glass-nav {
+  @apply bg-white/90 backdrop-blur-lg border-t border-gray-200/50;
+}
+
+/* Hide scrollbar for horizontal scroll areas */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 220" fill="none">
+  <!-- V letter -->
+  <polygon points="30,40 70,40 120,145 170,40 210,40 120,180" fill="#1A1A1A"/>
+
+  <!-- M letter -->
+  <rect x="175" y="40" width="38" height="140" fill="#1A1A1A"/>
+  <rect x="317" y="40" width="38" height="140" fill="#1A1A1A"/>
+  <polygon points="175,40 213,40 265,115 317,40 355,40 265,100" fill="#1A1A1A"/>
+
+  <!-- Hanger hook (black circle arc) -->
+  <path d="M265,8 C265,8 265,2 271,2 C277,2 277,8 277,14 C277,20 271,24 265,27" stroke="#1A1A1A" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+  <!-- Hanger arch (black) -->
+  <path d="M265,27 C265,27 200,27 175,55 C168,63 175,75 185,75" stroke="#1A1A1A" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M265,27 C265,27 330,27 355,55 C362,63 355,75 345,75" stroke="#1A1A1A" stroke-width="9" fill="none" stroke-linecap="round"/>
+
+  <!-- Hanger bar (gold) -->
+  <line x1="175" y1="75" x2="355" y2="75" stroke="#C9973F" stroke-width="9" stroke-linecap="round"/>
+
+  <!-- Text: VARIEDADES MELISSA -->
+  <text x="210" y="210" font-family="'Helvetica Neue', Arial, sans-serif" font-size="22" font-weight="300" letter-spacing="8" fill="#1A1A1A" text-anchor="middle">VARIEDADES MELISSA</text>
+</svg>
