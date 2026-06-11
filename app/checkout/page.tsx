@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, ChevronDown, ChevronUp, Ticket, Loader2 } from 'lucide-react'
+import { ArrowLeft, ChevronDown, ChevronUp, Ticket, Loader2, User, MapPin, Truck } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useCartStore } from '@/hooks/useCart'
 import { formatPrice } from '@/lib/utils'
@@ -184,37 +184,22 @@ export default function CheckoutPage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', paddingBottom: 60 }}>
       {/* Header bar */}
-      <div style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 40,
-        background: 'white',
-        borderBottom: '1px solid var(--border)',
-        padding: '14px 16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16
-      }}>
-        <Link href="/carrito" style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 36,
-          height: 36,
-          borderRadius: '50%',
-          border: '1px solid var(--border)',
-          color: 'var(--text)',
-          textDecoration: 'none'
-        }}>
-          <ArrowLeft size={20} />
+      <header className="sticky top-0 z-40 bg-white border-b border-[var(--border)] px-4 py-3 flex items-center justify-between">
+        <Link href="/carrito" className="flex items-center justify-center w-9 h-9 rounded-full border border-[var(--border)] text-[var(--text)] transition-colors hover:bg-[var(--brand-50)]">
+          <ArrowLeft size={18} />
         </Link>
-        <span style={{ fontWeight: 600, fontSize: 16 }}>Finalizar Compra</span>
-      </div>
+        <h1 className="font-bold text-[16px] text-[var(--text)] tracking-tight text-center flex-1">
+          Finalizar Compra
+        </h1>
+        {/* Empty space for layout balance */}
+        <div className="w-9 h-9" />
+      </header>
 
       <main style={{ padding: '16px' }}>
         {/* Collapsible summary drawer */}
-        <div className="card" style={{ marginBottom: 20, overflow: 'hidden' }}>
+        <div className={`card overflow-hidden transition-all duration-300 border ${isSummaryExpanded ? 'border-[var(--accent)]' : 'border-gray-100'} mb-6`}>
           <button
+            type="button"
             onClick={() => setIsSummaryExpanded(!isSummaryExpanded)}
             style={{
               width: '100%',
@@ -231,7 +216,7 @@ export default function CheckoutPage() {
             }}
           >
             <span>Resumen del Pedido ({items.length} {items.length === 1 ? 'prenda' : 'prendas'})</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--brand)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} className="text-[var(--accent)]">
               <span>{formatPrice(finalTotal)}</span>
               {isSummaryExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </div>
@@ -244,7 +229,7 @@ export default function CheckoutPage() {
               display: 'flex',
               flexDirection: 'column',
               gap: 12
-            }}>
+            }} className="bg-white">
               {items.map((item) => (
                 <div key={`${item.product.id}-${item.size}-${item.color}`} style={{
                   display: 'flex',
@@ -253,13 +238,37 @@ export default function CheckoutPage() {
                   gap: 12,
                   marginTop: 12
                 }}>
-                  <div style={{ minWidth: 0 }}>
-                    <p style={{ margin: 0, fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {item.product.name}
-                    </p>
-                    <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)' }}>
-                      Cant: {item.quantity} {item.size ? `| Talla: ${item.size}` : ''} {item.color ? `| Color: ${item.color}` : ''}
-                    </p>
+                  <div style={{ display: 'flex', gap: 12, minWidth: 0 }}>
+                    <div style={{
+                      position: 'relative',
+                      width: 40,
+                      height: 40,
+                      borderRadius: 8,
+                      overflow: 'hidden',
+                      flexShrink: 0,
+                      border: '1px solid var(--border)'
+                    }}>
+                      {item.product.images?.[0] ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={item.product.images[0]}
+                          alt={item.product.name}
+                          className="object-cover w-full h-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-sm">
+                          👗
+                        </div>
+                      )}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <p style={{ margin: 0, fontWeight: 500 }} className="truncate">
+                        {item.product.name}
+                      </p>
+                      <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)' }}>
+                        Cant: {item.quantity} {item.size ? `| Talla: ${item.size}` : ''} {item.color ? `| Color: ${item.color}` : ''}
+                      </p>
+                    </div>
                   </div>
                   <span style={{ fontWeight: 600 }}>{formatPrice(item.product.price * item.quantity)}</span>
                 </div>
@@ -282,7 +291,7 @@ export default function CheckoutPage() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 700, fontSize: 15, borderTop: '1px dashed var(--border)', paddingTop: 8, marginTop: 4 }}>
                   <span>Total</span>
-                  <span style={{ color: 'var(--brand)' }}>{formatPrice(finalTotal)}</span>
+                  <span className="text-[var(--accent)]">{formatPrice(finalTotal)}</span>
                 </div>
               </div>
             </div>
@@ -290,219 +299,249 @@ export default function CheckoutPage() {
         </div>
 
         {/* Checkout Form */}
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', margin: '4px 0 0 0' }}>
-            Información de Entrega
-          </h2>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Nombre Completo *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="Ej. Melissa Rodríguez"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Celular *
-            </label>
-            <input
-              type="tel"
-              required
-              placeholder="Ej. 312 345 6789"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Email (Opcional)
-            </label>
-            <input
-              type="email"
-              placeholder="Ej. correo@ejemplo.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Departamento *
-            </label>
-            <select
-              required
-              value={department}
-              onChange={(e) => setDepartment(e.target.value)}
-            >
-              <option value="">Selecciona tu departamento</option>
-              {DEPARTMENTS.map((d) => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Ciudad *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="Ej. Medellín"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Dirección de Entrega *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="Calle 10 # 5-20 Apto 301"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Indicaciones / Notas (Opcional)
-            </label>
-            <textarea
-              placeholder="Ej. Portería principal, color de portón, etc."
-              rows={3}
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              style={{ resize: 'vertical' }}
-            />
-          </div>
-
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginTop: 8, marginBottom: 4 }}>
-            Método de Envío
-          </h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-            {/* Standard Shipping */}
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: 14,
-              borderRadius: 8,
-              border: shippingMethod === 'standard' ? '2px solid var(--brand)' : '1px solid var(--border)',
-              backgroundColor: shippingMethod === 'standard' ? 'var(--brand-50)' : 'white',
-              cursor: 'pointer',
-              transition: 'all 0.15s'
-            }}>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <input
-                  type="radio"
-                  name="shipping"
-                  checked={shippingMethod === 'standard'}
-                  onChange={() => setShippingMethod('standard')}
-                  style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
-                />
-                <div style={{ lineHeight: 1.2 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>Envío Estándar</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Llega de 3 a 5 días hábiles</div>
-                </div>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          
+          {/* Section 01: Información Personal */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[var(--brand-50)] text-[var(--accent)]">
+                <User size={15} />
               </div>
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--brand)' }}>{formatPrice(9900)}</span>
-            </label>
+              <h2 className="font-bold text-sm text-[var(--text)] uppercase tracking-wider">
+                01 · Información Personal
+              </h2>
+            </div>
 
-            {/* Express Shipping */}
-            <label style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: 14,
-              borderRadius: 8,
-              border: shippingMethod === 'express' ? '2px solid var(--brand)' : '1px solid var(--border)',
-              backgroundColor: shippingMethod === 'express' ? 'var(--brand-50)' : 'white',
-              cursor: 'pointer',
-              transition: 'all 0.15s'
-            }}>
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <input
-                  type="radio"
-                  name="shipping"
-                  checked={shippingMethod === 'express'}
-                  onChange={() => setShippingMethod('express')}
-                  style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
-                />
-                <div style={{ lineHeight: 1.2 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600 }}>Envío Express</div>
-                  <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Llega de 1 a 2 días hábiles</div>
-                </div>
-              </div>
-              <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--brand)' }}>{formatPrice(18900)}</span>
-            </label>
-          </div>
-
-          {/* Coupon Code Input */}
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginTop: 8, marginBottom: 4 }}>
-            Cupón de Descuento
-          </h2>
-          <div style={{ display: 'flex', gap: 8, position: 'relative' }}>
-            <div style={{ position: 'relative', flexGrow: 1 }}>
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Nombre Completo *
+              </label>
               <input
                 type="text"
-                placeholder="Ingresa tu cupón"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value)}
-                style={{ paddingLeft: 40 }}
-                disabled={!!appliedCoupon}
+                required
+                placeholder="Ej. Melissa Rodríguez"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
               />
-              <Ticket size={18} style={{
-                position: 'absolute',
-                left: 12,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--text-muted)'
-              }} />
             </div>
-            {appliedCoupon ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setAppliedCoupon(null)
-                  setCouponCode('')
-                }}
-                className="btn-brand"
-                style={{ width: 'auto', backgroundColor: 'var(--error)', padding: '0 16px', fontSize: 13 }}
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Celular *
+              </label>
+              <input
+                type="tel"
+                required
+                placeholder="Ej. 312 345 6789"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Email (Opcional)
+              </label>
+              <input
+                type="email"
+                placeholder="Ej. correo@ejemplo.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Section 02: Dirección de Entrega */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[var(--brand-50)] text-[var(--accent)]">
+                <MapPin size={15} />
+              </div>
+              <h2 className="font-bold text-sm text-[var(--text)] uppercase tracking-wider">
+                02 · Dirección de Entrega
+              </h2>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Departamento *
+              </label>
+              <select
+                required
+                value={department}
+                onChange={(e) => setDepartment(e.target.value)}
+                className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none cursor-pointer"
               >
-                Quitar
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleApplyCoupon}
-                className="btn-brand"
-                style={{ width: 'auto', padding: '0 20px', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                disabled={applyingCoupon || !couponCode.trim()}
-              >
-                {applyingCoupon ? <Loader2 size={16} className="animate-spin" /> : 'Aplicar'}
-              </button>
+                <option value="">Selecciona tu departamento</option>
+                {DEPARTMENTS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Ciudad *
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Ej. Medellín"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Dirección de Entrega *
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Calle 10 # 5-20 Apto 301"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Indicaciones / Notas (Opcional)
+              </label>
+              <textarea
+                placeholder="Ej. Portería principal, color de portón, etc."
+                rows={3}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                style={{ resize: 'vertical' }}
+                className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+              />
+            </div>
+          </div>
+
+          {/* Section 03: Método de Envío */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[var(--brand-50)] text-[var(--accent)]">
+                <Truck size={15} />
+              </div>
+              <h2 className="font-bold text-sm text-[var(--text)] uppercase tracking-wider">
+                03 · Método de Envío
+              </h2>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {/* Standard Shipping */}
+              <label className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
+                shippingMethod === 'standard' ? 'border-[var(--accent)] bg-[var(--brand-50)]' : 'border-[var(--border)] bg-white'
+              }`}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <input
+                    type="radio"
+                    name="shipping"
+                    checked={shippingMethod === 'standard'}
+                    onChange={() => setShippingMethod('standard')}
+                    style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
+                  />
+                  <div style={{ lineHeight: 1.2 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>Envío Estándar</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Llega de 3 a 5 días hábiles</div>
+                  </div>
+                </div>
+                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>{formatPrice(9900)}</span>
+              </label>
+
+              {/* Express Shipping */}
+              <label className={`flex items-center justify-between p-4 rounded-xl border transition-all cursor-pointer ${
+                shippingMethod === 'express' ? 'border-[var(--accent)] bg-[var(--brand-50)]' : 'border-[var(--border)] bg-white'
+              }`}>
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+                  <input
+                    type="radio"
+                    name="shipping"
+                    checked={shippingMethod === 'express'}
+                    onChange={() => setShippingMethod('express')}
+                    style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
+                  />
+                  <div style={{ lineHeight: 1.2 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>Envío Express</div>
+                    <div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Llega de 1 a 2 días hábiles</div>
+                  </div>
+                </div>
+                <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--accent)' }}>{formatPrice(18900)}</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Section 04: Cupón de Descuento */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center justify-center w-7 h-7 rounded-full bg-[var(--brand-50)] text-[var(--accent)]">
+                <Ticket size={15} />
+              </div>
+              <h2 className="font-bold text-sm text-[var(--text)] uppercase tracking-wider">
+                04 · Cupón de Descuento
+              </h2>
+            </div>
+
+            <div style={{ display: 'flex', gap: 8, position: 'relative' }}>
+              <div style={{ position: 'relative', flexGrow: 1 }}>
+                <input
+                  type="text"
+                  placeholder="Ingresa tu cupón"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  style={{ paddingLeft: 40 }}
+                  disabled={!!appliedCoupon}
+                  className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+                />
+                <Ticket size={18} style={{
+                  position: 'absolute',
+                  left: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted)'
+                }} />
+              </div>
+              {appliedCoupon ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAppliedCoupon(null)
+                    setCouponCode('')
+                  }}
+                  className="btn-brand"
+                  style={{ width: 'auto', backgroundColor: 'var(--error)', padding: '0 16px', fontSize: 13 }}
+                >
+                  Quitar
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleApplyCoupon}
+                  className="btn-brand"
+                  style={{ width: 'auto', padding: '0 20px', fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  disabled={applyingCoupon || !couponCode.trim()}
+                >
+                  {applyingCoupon ? <Loader2 size={16} className="animate-spin" /> : 'Aplicar'}
+                </button>
+              )}
+            </div>
+            {couponError && (
+              <p style={{ color: 'var(--error)', fontSize: 12, margin: '-8px 0 0 0' }}>{couponError}</p>
+            )}
+            {appliedCoupon && (
+              <p style={{ color: 'var(--success)', fontSize: 12, margin: '-8px 0 0 0', fontWeight: 600 }}>
+                ¡Cupón aplicado con éxito! Descuento: {appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : formatPrice(appliedCoupon.discount_value)}
+              </p>
             )}
           </div>
-          {couponError && (
-            <p style={{ color: 'var(--error)', fontSize: 12, margin: '-8px 0 0 0' }}>{couponError}</p>
-          )}
-          {appliedCoupon && (
-            <p style={{ color: 'var(--success)', fontSize: 12, margin: '-8px 0 0 0', fontWeight: 600 }}>
-              ¡Cupón aplicado con éxito! Descuento: {appliedCoupon.discount_type === 'percentage' ? `${appliedCoupon.discount_value}%` : formatPrice(appliedCoupon.discount_value)}
-            </p>
-          )}
 
           {/* Form Error Message */}
           {formError && (
@@ -523,16 +562,9 @@ export default function CheckoutPage() {
           {/* Final Submit Button */}
           <button
             type="submit"
-            className="btn-brand"
             disabled={submitting}
-            style={{
-              marginTop: 20,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              height: 52
-            }}
+            className="w-full rounded-xl bg-[var(--brand)] hover:bg-[var(--brand-light)] active:bg-[var(--brand-dark)] text-white font-semibold text-[15px] transition-colors flex items-center justify-center gap-2 mt-4"
+            style={{ height: '54px' }}
           >
             {submitting ? (
               <>
@@ -540,7 +572,7 @@ export default function CheckoutPage() {
                 Procesando pedido...
               </>
             ) : (
-              `Confirmar pedido - ${formatPrice(finalTotal)}`
+              `Confirmar pedido · ${formatPrice(finalTotal)}`
             )}
           </button>
         </form>
