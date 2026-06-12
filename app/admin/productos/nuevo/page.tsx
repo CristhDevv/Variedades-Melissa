@@ -167,38 +167,32 @@ export default function NuevoProductoPage() {
   }
 
   return (
-    <div>
-      {/* Top bar with back */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
-        <Link href="/admin/productos" style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 36,
-          height: 36,
-          borderRadius: '50%',
-          border: '1px solid var(--border)',
-          color: 'var(--text)',
-          textDecoration: 'none'
-        }}>
+    <div className="max-w-3xl mx-auto px-4 py-8">
+      {/* Top Header */}
+      <div className="flex items-center gap-4 mb-10 pb-6 border-b border-gray-100">
+        <Link href="/admin/productos" className="flex items-center justify-center w-10 h-10 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors text-gray-700">
           <ArrowLeft size={20} />
         </Link>
-        <h1 style={{ fontSize: 24, fontWeight: 800, color: 'var(--text)', margin: 0 }}>
-          Nuevo Producto
-        </h1>
+        <div>
+          <span className="text-[11px] font-bold text-amber-600 tracking-widest uppercase">Admin Panel</span>
+          <h1 className="text-2xl font-black text-gray-900 tracking-tight leading-tight">
+            Crear Producto
+          </h1>
+        </div>
       </div>
 
-      <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20 }} className="md-grid-2">
-          {/* Left Column: Core info */}
-          <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, borderBottom: '1px solid var(--border)', paddingBottom: 8, margin: 0 }}>
-              Información Básica
-            </h2>
-
+      <form onSubmit={handleSave} className="space-y-10">
+        
+        {/* Sección: Información Básica */}
+        <section className="space-y-6">
+          <h2 className="text-[11px] font-bold tracking-widest uppercase text-gray-400">
+            Información Básica
+          </h2>
+          
+          <div className="space-y-5">
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                Nombre del Producto *
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Nombre del Producto <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -206,380 +200,414 @@ export default function NuevoProductoPage() {
                 placeholder="Ej. Vestido Floreado Primavera"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors"
               />
             </div>
 
             <div>
-              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
                 Descripción
               </label>
               <textarea
-                placeholder="Detalla las características de la prenda..."
+                placeholder="Detalla las características de la prenda, materiales, etc..."
                 rows={5}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                style={{ resize: 'vertical' }}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors resize-y"
               />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Precio (COP) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  placeholder="89900"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Precio Comparación (Tachado)
-                </label>
-                <input
-                  type="number"
-                  placeholder="120000"
-                  value={comparePrice}
-                  onChange={(e) => setComparePrice(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Categoría
-                </label>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Categoría
+              </label>
+              <div className="relative">
                 <select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black transition-colors appearance-none"
                 >
                   <option value="">Sin Categoría</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
-              </div>
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Stock Disponible
-                </label>
-                <input
-                  type="number"
-                  placeholder="10"
-                  value={stock}
-                  onChange={(e) => setStock(e.target.value)}
-                />
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                  <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                    <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                  </svg>
+                </div>
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Checkboxes */}
-            <div style={{ display: 'flex', gap: 24, marginTop: 8 }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>
+        <hr className="border-t border-gray-100" />
+
+        {/* Sección: Precios */}
+        <section className="space-y-6">
+          <h2 className="text-[11px] font-bold tracking-widest uppercase text-gray-400">
+            Precios
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Precio (COP) <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="number"
+                required
+                placeholder="Ej. 89900"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Precio Comparación (Tachado)
+              </label>
+              <input
+                type="number"
+                placeholder="Ej. 120000"
+                value={comparePrice}
+                onChange={(e) => setComparePrice(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors"
+              />
+            </div>
+          </div>
+        </section>
+
+        <hr className="border-t border-gray-100" />
+
+        {/* Sección: Inventario y Visibilidad */}
+        <section className="space-y-6">
+          <h2 className="text-[11px] font-bold tracking-widest uppercase text-gray-400">
+            Inventario & Configuración
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Stock Disponible
+              </label>
+              <input
+                type="number"
+                placeholder="Ej. 10"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors"
+              />
+            </div>
+            
+            <div className="flex flex-wrap gap-6 py-2">
+              <label className="flex items-center gap-3 cursor-pointer text-sm font-medium text-gray-700 select-none">
                 <input
                   type="checkbox"
                   checked={active}
                   onChange={(e) => setActive(e.target.checked)}
-                  style={{ width: 'auto', cursor: 'pointer' }}
+                  className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer"
                 />
                 Activo (Visible en tienda)
               </label>
 
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>
+              <label className="flex items-center gap-3 cursor-pointer text-sm font-medium text-gray-700 select-none">
                 <input
                   type="checkbox"
                   checked={featured}
                   onChange={(e) => setFeatured(e.target.checked)}
-                  style={{ width: 'auto', cursor: 'pointer' }}
+                  className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black cursor-pointer"
                 />
                 Destacado (Inicio)
               </label>
             </div>
           </div>
+        </section>
 
-          {/* Right Column: Variants & Media */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            {/* Sizes & Colors */}
-            <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, borderBottom: '1px solid var(--border)', paddingBottom: 8, margin: 0 }}>
-                Variantes (Tallas & Colores)
-              </h2>
+        <hr className="border-t border-gray-100" />
 
-              {/* Sizes input */}
+        {/* Sección: Variantes (Tallas y Colores) */}
+        <section className="space-y-6">
+          <h2 className="text-[11px] font-bold tracking-widest uppercase text-gray-400">
+            Variantes (Tallas & Colores)
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Tallas */}
+            <div className="space-y-4">
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
                   Agregar Talla
                 </label>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Ej. S, M, L, XL"
                     value={sizeInput}
                     onChange={(e) => setSizeInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddSize(); } }}
+                    className="flex-grow px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors"
                   />
-                  <button type="button" onClick={handleAddSize} className="btn-brand" style={{ width: 'auto', padding: '0 16px' }}>
+                  <button
+                    type="button"
+                    onClick={handleAddSize}
+                    className="flex items-center justify-center px-4 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors"
+                  >
                     <Plus size={18} />
                   </button>
                 </div>
-                {/* Sizes chips display */}
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 10 }}>
-                  {sizes.map((s) => (
-                    <span key={s} style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      fontSize: 12,
-                      backgroundColor: 'var(--bg)',
-                      border: '1px solid var(--border)',
-                      padding: '4px 10px',
-                      borderRadius: 6,
-                      fontWeight: 600
-                    }}>
-                      {s}
-                      <button type="button" onClick={() => setSizes(sizes.filter(x => x !== s))} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--error)', padding: 0 }}>
-                        <X size={12} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
               </div>
 
-              {/* Colors input */}
+              {/* Chips de Tallas */}
+              <div className="flex flex-wrap gap-2">
+                {sizes.map((s) => (
+                  <span
+                    key={s}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-50 border border-gray-200 text-gray-800"
+                  >
+                    {s}
+                    <button
+                      type="button"
+                      onClick={() => setSizes(sizes.filter(x => x !== s))}
+                      className="text-gray-400 hover:text-rose-600 transition-colors focus:outline-none"
+                    >
+                      <X size={14} />
+                    </button>
+                  </span>
+                ))}
+                {sizes.length === 0 && (
+                  <span className="text-xs text-gray-400 italic">No hay tallas agregadas.</span>
+                )}
+              </div>
+            </div>
+
+            {/* Colores */}
+            <div className="space-y-4">
               <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
                   Agregar Color
                 </label>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div className="flex gap-2">
                   <input
                     type="text"
                     placeholder="Nombre (Ej. Rosado)"
                     value={colorNameInput}
                     onChange={(e) => setColorNameInput(e.target.value)}
-                    style={{ flexGrow: 1 }}
+                    className="flex-grow px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors"
                   />
                   <input
                     type="color"
                     value={colorHexInput}
                     onChange={(e) => setColorHexInput(e.target.value)}
-                    style={{ width: 48, padding: 0, height: 48, cursor: 'pointer', border: '1.5px solid var(--border)' }}
+                    className="w-12 h-11 p-0 rounded-lg cursor-pointer border border-gray-200 overflow-hidden bg-white"
                   />
-                  <button type="button" onClick={handleAddColor} className="btn-brand" style={{ width: 'auto', padding: '0 16px' }}>
+                  <button
+                    type="button"
+                    onClick={handleAddColor}
+                    className="flex items-center justify-center px-4 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors"
+                  >
                     <Plus size={18} />
                   </button>
                 </div>
-                {/* Colors chips display */}
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 10 }}>
-                  {colors.map((c) => (
-                    <span key={c.name} style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      fontSize: 12,
-                      backgroundColor: 'var(--bg)',
-                      border: '1px solid var(--border)',
-                      padding: '4px 10px',
-                      borderRadius: 6,
-                      fontWeight: 500
-                    }}>
-                      <span style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: c.hex, border: '1px solid rgba(0,0,0,0.1)' }} />
-                      {c.name}
-                      <button type="button" onClick={() => setColors(colors.filter(x => x.name !== c.name))} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--error)', padding: 0 }}>
-                        <X size={12} />
+              </div>
+
+              {/* Chips de Colores */}
+              <div className="flex flex-wrap gap-2">
+                {colors.map((c) => (
+                  <span
+                    key={c.name}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-50 border border-gray-200 text-gray-800"
+                  >
+                    <span
+                      style={{ backgroundColor: c.hex }}
+                      className="w-3.5 h-3.5 rounded-full border border-black/10"
+                    />
+                    {c.name}
+                    <button
+                      type="button"
+                      onClick={() => setColors(colors.filter(x => x.name !== c.name))}
+                      className="text-gray-400 hover:text-rose-600 transition-colors focus:outline-none"
+                    >
+                      <X size={14} />
+                    </button>
+                  </span>
+                ))}
+                {colors.length === 0 && (
+                  <span className="text-xs text-gray-400 italic">No hay colores agregados.</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <hr className="border-t border-gray-100" />
+
+        {/* Sección: Imágenes */}
+        <section className="space-y-6">
+          <h2 className="text-[11px] font-bold tracking-widest uppercase text-gray-400">
+            Imágenes del Producto
+          </h2>
+          
+          <div className="space-y-6">
+            {/* Carga de archivos */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Subir Imágenes
+              </label>
+              <label className="group flex flex-col items-center justify-center border-2 border-dashed border-gray-200 hover:border-gray-400 rounded-xl p-8 cursor-pointer transition-colors bg-gray-50/50">
+                <Upload size={24} className="text-gray-400 group-hover:text-black transition-colors" />
+                <span className="text-sm font-semibold text-gray-700 mt-3">Sube tus archivos</span>
+                <span className="text-xs text-gray-400 mt-1">Haz clic para seleccionar imágenes</span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      setImageFiles([...imageFiles, ...Array.from(e.target.files)])
+                    }
+                  }}
+                  className="hidden"
+                />
+              </label>
+
+              {/* Lista de archivos a subir */}
+              {imageFiles.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {imageFiles.map((file, idx) => (
+                    <span
+                      key={idx}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200"
+                    >
+                      {file.name.substring(0, 18)}
+                      {file.name.length > 18 && '...'}
+                      <button
+                        type="button"
+                        onClick={() => setImageFiles(imageFiles.filter((_, i) => i !== idx))}
+                        className="text-amber-500 hover:text-amber-700 transition-colors focus:outline-none"
+                      >
+                        <X size={14} />
                       </button>
                     </span>
                   ))}
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Media Upload & URLs */}
-            <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, borderBottom: '1px solid var(--border)', paddingBottom: 8, margin: 0 }}>
-                Imágenes del Producto
-              </h2>
-
-              {/* File upload input */}
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Subir Archivos
-                </label>
-                <label style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  padding: '24px 16px',
-                  border: '2px dashed var(--border)',
-                  borderRadius: 8,
-                  cursor: 'pointer',
-                  backgroundColor: 'var(--bg)',
-                  transition: 'border-color 0.2s'
-                }}>
-                  <Upload size={24} color="var(--brand)" />
-                  <span style={{ fontSize: 13, marginTop: 8, color: 'var(--text-muted)' }}>Haz click para seleccionar imágenes</span>
-                  <input
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    onChange={(e) => {
-                      if (e.target.files) {
-                        setImageFiles([...imageFiles, ...Array.from(e.target.files)])
-                      }
-                    }}
-                    style={{ display: 'none' }}
-                  />
-                </label>
-                {/* Files display list */}
-                {imageFiles.length > 0 && (
-                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 12 }}>
-                    {imageFiles.map((file, idx) => (
-                      <span key={idx} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 6,
-                        fontSize: 11,
-                        backgroundColor: '#E0F2FE',
-                        color: '#0369A1',
-                        padding: '4px 8px',
-                        borderRadius: 6
-                      }}>
-                        {file.name.substring(0, 15)}...
-                        <button type="button" onClick={() => setImageFiles(imageFiles.filter((_, i) => i !== idx))} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#0369A1', padding: 0 }}>
-                          <X size={12} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Direct URLs backup */}
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  O ingresar URLs de imagen
-                </label>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  <input
-                    type="text"
-                    placeholder="https://ejemplo.com/imagen.jpg"
-                    value={urlInput}
-                    onChange={(e) => setUrlInput(e.target.value)}
-                  />
-                  <button type="button" onClick={handleAddUrl} className="btn-brand" style={{ width: 'auto', padding: '0 16px' }}>
-                    <Plus size={18} />
-                  </button>
-                </div>
-                {/* URLs list */}
-                {manualUrls.length > 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginTop: 12 }}>
-                    {manualUrls.map((url) => (
-                      <span key={url} style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        fontSize: 11,
-                        backgroundColor: 'var(--bg)',
-                        border: '1px solid var(--border)',
-                        padding: '4px 8px',
-                        borderRadius: 6
-                      }}>
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '85%' }}>{url}</span>
-                        <button type="button" onClick={() => setManualUrls(manualUrls.filter(x => x !== url))} style={{ border: 'none', background: 'none', cursor: 'pointer', color: 'var(--error)' }}>
-                          <X size={12} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* SEO Section */}
-            <div className="card" style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <h2 style={{ fontSize: 16, fontWeight: 700, borderBottom: '1px solid var(--border)', paddingBottom: 8, margin: 0 }}>
-                SEO / Metatags
-              </h2>
-
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Meta Título (Título SEO)
-                </label>
+            {/* URLs externas */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                O ingresar URLs de imagen externas
+              </label>
+              <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Ej. Vestido Floreado de Moda Femenina | Variedades Melissa"
-                  value={metaTitle}
-                  onChange={(e) => setMetaTitle(e.target.value)}
+                  placeholder="https://ejemplo.com/imagen.jpg"
+                  value={urlInput}
+                  onChange={(e) => setUrlInput(e.target.value)}
+                  className="flex-grow px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors"
                 />
+                <button
+                  type="button"
+                  onClick={handleAddUrl}
+                  className="flex items-center justify-center px-4 rounded-lg bg-black text-white hover:bg-gray-800 transition-colors"
+                >
+                  <Plus size={18} />
+                </button>
               </div>
 
-              <div>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                  Meta Descripción
-                </label>
-                <textarea
-                  placeholder="Descripción resumida para buscadores (Google)..."
-                  rows={3}
-                  value={metaDescription}
-                  onChange={(e) => setMetaDescription(e.target.value)}
-                  style={{ resize: 'vertical' }}
-                />
-              </div>
+              {/* Lista de URLs ingresadas */}
+              {manualUrls.length > 0 && (
+                <div className="space-y-2 mt-4">
+                  {manualUrls.map((url) => (
+                    <div
+                      key={url}
+                      className="flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-xs bg-gray-50 border border-gray-200 text-gray-600"
+                    >
+                      <span className="truncate max-w-[85%]">{url}</span>
+                      <button
+                        type="button"
+                        onClick={() => setManualUrls(manualUrls.filter(x => x !== url))}
+                        className="text-gray-400 hover:text-rose-600 transition-colors focus:outline-none"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Form Error Message */}
+        <hr className="border-t border-gray-100" />
+
+        {/* Sección: SEO */}
+        <section className="space-y-6">
+          <h2 className="text-[11px] font-bold tracking-widest uppercase text-gray-400">
+            Optimización SEO
+          </h2>
+          
+          <div className="space-y-5">
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Meta Título
+              </label>
+              <input
+                type="text"
+                placeholder="Ej. Vestido Floreado de Moda Femenina | Variedades Melissa"
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
+                Meta Descripción
+              </label>
+              <textarea
+                placeholder="Descripción resumida de 150-160 caracteres para Google..."
+                rows={3}
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-gray-950 text-sm focus:outline-none focus:ring-1 focus:ring-black focus:border-black placeholder-gray-400 transition-colors resize-y"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Error message */}
         {errorMsg && (
-          <div style={{
-            backgroundColor: '#FEF2F2',
-            border: '1px solid #FCA5A5',
-            padding: 12,
-            borderRadius: 8,
-            color: 'var(--error)',
-            fontSize: 13,
-            fontWeight: 500
-          }}>
+          <div className="p-4 rounded-lg bg-rose-50 border border-rose-200 text-sm text-rose-600 font-medium">
             {errorMsg}
           </div>
         )}
 
-        {/* Submit */}
-        <button
-          type="submit"
-          className="btn-brand"
-          disabled={submitting}
-          style={{
-            height: 52,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 8,
-            marginBottom: 20
-          }}
-        >
-          {submitting ? (
-            <>
-              <Loader2 size={20} className="animate-spin" />
-              Guardando producto y publicando...
-            </>
-          ) : 'Guardar y Publicar'}
-        </button>
-      </form>
+        {/* Botones de acción (Guardar / Cancelar) */}
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-gray-100 sticky bottom-0 bg-white/95 backdrop-blur py-4 z-10 -mx-4 px-4 sm:mx-0 sm:px-0">
+          <Link
+            href="/admin/productos"
+            className="w-full sm:w-auto px-6 py-3 text-center rounded-lg border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            Cancelar
+          </Link>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full sm:w-auto min-w-[180px] px-6 py-3 flex items-center justify-center gap-2 rounded-lg bg-black text-white hover:bg-gray-800 disabled:opacity-50 text-sm font-semibold transition-colors"
+          >
+            {submitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                <span>Guardando...</span>
+              </>
+            ) : (
+              <span>Guardar y Publicar</span>
+            )}
+          </button>
+        </div>
 
-      <style>{`
-        @media (min-width: 992px) {
-          .md-grid-2 {
-            display: grid !important;
-            grid-template-columns: 1.2fr 0.8fr !important;
-            align-items: start;
-          }
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .animate-spin { animation: spin 1s linear infinite; }
-      `}</style>
+      </form>
     </div>
   )
 }
