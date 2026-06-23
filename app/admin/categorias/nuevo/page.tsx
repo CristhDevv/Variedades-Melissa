@@ -125,19 +125,6 @@ export default function NuevoCategoriaPage() {
             />
           </div>
 
-          <div>
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Slug (URL identificador) *
-            </label>
-            <input
-              type="text"
-              required
-              placeholder="ej-vestidos"
-              value={slug}
-              onChange={(e) => setSlug(slugify(e.target.value))}
-              className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
-            />
-          </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>

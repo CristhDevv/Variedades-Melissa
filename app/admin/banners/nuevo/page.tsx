@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, Loader2, Upload } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -11,9 +11,16 @@ export default function NuevoBannerPage() {
   // Form states
   const [title, setTitle] = useState('')
   const [subtitle, setSubtitle] = useState('')
-  const [link, setLink] = useState('')
+  const [linkType, setLinkType] = useState<'none' | 'home' | 'category' | 'product'>('none')
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState('')
+  const [selectedProductSlug, setSelectedProductSlug] = useState('')
   const [sortOrder, setSortOrder] = useState('0')
   const [active, setActive] = useState(true)
+
+  // Options states
+  const [categories, setCategories] = useState<any[]>([])
+  const [products, setProducts] = useState<any[]>([])
+  const [loadingOptions, setLoadingOptions] = useState(false)
 
   // Media
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -22,6 +29,33 @@ export default function NuevoBannerPage() {
   const [saving, setSaving] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
+  useEffect(() => {
+    const fetchOptions = async () => {
+      setLoadingOptions(true)
+      try {
+        const { data: cats } = await supabase
+          .from('categories')
+          .select('name, slug')
+          .eq('active', true)
+          .order('name', { ascending: true })
+
+        const { data: prods } = await supabase
+          .from('products')
+          .select('name, slug')
+          .eq('active', true)
+          .order('name', { ascending: true })
+
+        if (cats) setCategories(cats)
+        if (prods) setProducts(prods)
+      } catch (err) {
+        console.error('Error al cargar categorías/productos:', err)
+      } finally {
+        setLoadingOptions(false)
+      }
+    }
+    fetchOptions()
+  }, [])
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMsg('')
@@ -29,6 +63,24 @@ export default function NuevoBannerPage() {
     if (!imageUrl.trim() && !imageFile) {
       setErrorMsg('La imagen es requerida para el banner.')
       return
+    }
+
+    // Build the redirect link based on friendly selector
+    let finalLink: string | null = null
+    if (linkType === 'home') {
+      finalLink = '/'
+    } else if (linkType === 'category') {
+      if (!selectedCategorySlug) {
+        setErrorMsg('Por favor selecciona una categoría de destino.')
+        return
+      }
+      finalLink = `/catalogo?categoria=${selectedCategorySlug}`
+    } else if (linkType === 'product') {
+      if (!selectedProductSlug) {
+        setErrorMsg('Por favor selecciona un producto de destino.')
+        return
+      }
+      finalLink = `/producto/${selectedProductSlug}`
     }
 
     setSaving(true)
@@ -60,7 +112,7 @@ export default function NuevoBannerPage() {
         title: title.trim() || null,
         subtitle: subtitle.trim() || null,
         image_url: finalImageUrl,
-        link: link.trim() || null,
+        link: finalLink,
         sort_order: parseInt(sortOrder, 10) || 0,
         active
       }
@@ -134,16 +186,73 @@ export default function NuevoBannerPage() {
 
           <div>
             <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-              Link de redirección (URL / Ruta interna)
+              Destino del Banner
             </label>
-            <input
-              type="text"
-              placeholder="Ej. /catalogo?categoria=vestidos o URL completa"
-              value={link}
-              onChange={(e) => setLink(e.target.value)}
+            <select
+              value={linkType}
+              onChange={(e) => {
+                setLinkType(e.target.value as any)
+                setSelectedCategorySlug('')
+                setSelectedProductSlug('')
+              }}
               className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
-            />
+            >
+              <option value="none">Sin enlace</option>
+              <option value="home">Página de inicio</option>
+              <option value="category">Categoría</option>
+              <option value="product">Producto</option>
+            </select>
           </div>
+
+          {linkType === 'category' && (
+            <div className="animate-fade-in">
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Selecciona la Categoría
+              </label>
+              {loadingOptions ? (
+                <span className="text-xs text-gray-500">Cargando categorías...</span>
+              ) : (
+                <select
+                  value={selectedCategorySlug}
+                  onChange={(e) => setSelectedCategorySlug(e.target.value)}
+                  className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+                  required
+                >
+                  <option value="">-- Elige una categoría --</option>
+                  {categories.map((cat) => (
+                    <option key={cat.slug} value={cat.slug}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
+
+          {linkType === 'product' && (
+            <div className="animate-fade-in">
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                Selecciona el Producto
+              </label>
+              {loadingOptions ? (
+                <span className="text-xs text-gray-500">Cargando productos...</span>
+              ) : (
+                <select
+                  value={selectedProductSlug}
+                  onChange={(e) => setSelectedProductSlug(e.target.value)}
+                  className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+                  required
+                >
+                  <option value="">-- Elige un producto --</option>
+                  {products.map((prod) => (
+                    <option key={prod.slug} value={prod.slug}>
+                      {prod.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <div>

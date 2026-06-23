@@ -17,9 +17,17 @@ export default function EditarBannerPage({ params }: Props) {
   // Form states
   const [title, setTitle] = useState('')
   const [subtitle, setSubtitle] = useState('')
-  const [link, setLink] = useState('')
+  const [linkType, setLinkType] = useState<'none' | 'home' | 'category' | 'product' | 'other'>('none')
+  const [selectedCategorySlug, setSelectedCategorySlug] = useState('')
+  const [selectedProductSlug, setSelectedProductSlug] = useState('')
+  const [originalLink, setOriginalLink] = useState('')
   const [sortOrder, setSortOrder] = useState('0')
   const [active, setActive] = useState(true)
+
+  // Options states
+  const [categories, setCategories] = useState<any[]>([])
+  const [products, setProducts] = useState<any[]>([])
+  const [loadingOptions, setLoadingOptions] = useState(false)
 
   // Media
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -29,28 +37,71 @@ export default function EditarBannerPage({ params }: Props) {
   const [errorMsg, setErrorMsg] = useState('')
 
   useEffect(() => {
-    const fetchBanner = async () => {
+    const fetchDataAndBanner = async () => {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('banners')
-        .select('*')
-        .eq('id', params.id)
-        .single()
-      
-      if (error || !data) {
-        setErrorMsg('No se pudo encontrar el banner solicitado.')
-      } else {
-        setTitle(data.title || '')
-        setSubtitle(data.subtitle || '')
-        setLink(data.link || '')
-        setSortOrder(data.sort_order.toString())
-        setActive(data.active)
-        setImageUrl(data.image_url)
+      setLoadingOptions(true)
+      try {
+        // Fetch categories & products
+        const { data: cats } = await supabase
+          .from('categories')
+          .select('name, slug')
+          .eq('active', true)
+          .order('name', { ascending: true })
+
+        const { data: prods } = await supabase
+          .from('products')
+          .select('name, slug')
+          .eq('active', true)
+          .order('name', { ascending: true })
+
+        if (cats) setCategories(cats)
+        if (prods) setProducts(prods)
+
+        // Fetch banner details
+        const { data: bannerData, error } = await supabase
+          .from('banners')
+          .select('*')
+          .eq('id', params.id)
+          .single()
+
+        if (error || !bannerData) {
+          setErrorMsg('No se pudo encontrar el banner solicitado.')
+        } else {
+          setTitle(bannerData.title || '')
+          setSubtitle(bannerData.subtitle || '')
+          setSortOrder(bannerData.sort_order.toString())
+          setActive(bannerData.active)
+          setImageUrl(bannerData.image_url)
+          
+          const rawLink = bannerData.link || ''
+          setOriginalLink(rawLink)
+
+          // Parse rawLink to determine linkType
+          if (!rawLink) {
+            setLinkType('none')
+          } else if (rawLink === '/') {
+            setLinkType('home')
+          } else if (rawLink.startsWith('/catalogo?categoria=')) {
+            setLinkType('category')
+            const catSlug = rawLink.split('categoria=')[1] || ''
+            setSelectedCategorySlug(catSlug)
+          } else if (rawLink.startsWith('/producto/')) {
+            setLinkType('product')
+            const prodSlug = rawLink.substring('/producto/'.length) || ''
+            setSelectedProductSlug(prodSlug)
+          } else {
+            setLinkType('other')
+          }
+        }
+      } catch (err: any) {
+        setErrorMsg('Error al cargar la información.')
+      } finally {
+        setLoading(false)
+        setLoadingOptions(false)
       }
-      setLoading(false)
     }
 
-    fetchBanner()
+    fetchDataAndBanner()
   }, [params.id])
 
   const handleSave = async (e: React.FormEvent) => {
@@ -60,6 +111,28 @@ export default function EditarBannerPage({ params }: Props) {
     if (!imageUrl.trim() && !imageFile) {
       setErrorMsg('La imagen es requerida para el banner.')
       return
+    }
+
+    // Build the redirect link based on friendly selector
+    let finalLink: string | null = null
+    if (linkType === 'none') {
+      finalLink = null
+    } else if (linkType === 'home') {
+      finalLink = '/'
+    } else if (linkType === 'category') {
+      if (!selectedCategorySlug) {
+        setErrorMsg('Por favor selecciona una categoría de destino.')
+        return
+      }
+      finalLink = `/catalogo?categoria=${selectedCategorySlug}`
+    } else if (linkType === 'product') {
+      if (!selectedProductSlug) {
+        setErrorMsg('Por favor selecciona un producto de destino.')
+        return
+      }
+      finalLink = `/producto/${selectedProductSlug}`
+    } else if (linkType === 'other') {
+      finalLink = originalLink
     }
 
     setSaving(true)
@@ -91,7 +164,7 @@ export default function EditarBannerPage({ params }: Props) {
         title: title.trim() || null,
         subtitle: subtitle.trim() || null,
         image_url: finalImageUrl,
-        link: link.trim() || null,
+        link: finalLink,
         sort_order: parseInt(sortOrder, 10) || 0,
         active
       }
@@ -175,16 +248,89 @@ export default function EditarBannerPage({ params }: Props) {
 
             <div>
               <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
-                Link de redirección (URL / Ruta interna)
+                Destino del Banner
               </label>
-              <input
-                type="text"
-                placeholder="Ej. /catalogo?categoria=vestidos o URL completa"
-                value={link}
-                onChange={(e) => setLink(e.target.value)}
+              <select
+                value={linkType}
+                onChange={(e) => {
+                  setLinkType(e.target.value as any)
+                  setSelectedCategorySlug('')
+                  setSelectedProductSlug('')
+                }}
                 className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
-              />
+              >
+                <option value="none">Sin enlace</option>
+                <option value="home">Página de inicio</option>
+                <option value="category">Categoría</option>
+                <option value="product">Producto</option>
+                {linkType === 'other' && <option value="other">Otro (Enlace personalizado)</option>}
+              </select>
             </div>
+
+            {linkType === 'category' && (
+              <div className="animate-fade-in">
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                  Selecciona la Categoría
+                </label>
+                {loadingOptions ? (
+                  <span className="text-xs text-gray-500">Cargando categorías...</span>
+                ) : (
+                  <select
+                    value={selectedCategorySlug}
+                    onChange={(e) => setSelectedCategorySlug(e.target.value)}
+                    className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+                    required
+                  >
+                    <option value="">-- Elige una categoría --</option>
+                    {categories.map((cat) => (
+                      <option key={cat.slug} value={cat.slug}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+
+            {linkType === 'product' && (
+              <div className="animate-fade-in">
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 6 }}>
+                  Selecciona el Producto
+                </label>
+                {loadingOptions ? (
+                  <span className="text-xs text-gray-500">Cargando productos...</span>
+                ) : (
+                  <select
+                    value={selectedProductSlug}
+                    onChange={(e) => setSelectedProductSlug(e.target.value)}
+                    className="w-full px-4 py-3 rounded-[10px] border border-[var(--border)] focus:border-[var(--accent)] transition-colors text-sm bg-white text-[var(--text)] outline-none focus:outline-none"
+                    required
+                  >
+                    <option value="">-- Elige un producto --</option>
+                    {products.map((prod) => (
+                      <option key={prod.slug} value={prod.slug}>
+                        {prod.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+            )}
+
+            {linkType === 'other' && (
+              <div style={{
+                backgroundColor: '#FEF3C7',
+                border: '1px solid #FCD34D',
+                color: '#92400E',
+                padding: '12px 14px',
+                borderRadius: 10,
+                fontSize: 12,
+                fontWeight: 500
+              }} className="animate-fade-in">
+                Enlace personalizado configurado: <strong style={{ textDecoration: 'underline' }}>{originalLink}</strong>. 
+                El enlace no estándar se preservará. Selecciona otra opción en el destino si deseas cambiarlo.
+              </div>
+            )}
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
               <div>
