@@ -75,21 +75,19 @@ export async function publishProductToZernio(product: Product): Promise<string> 
 
   const zernio = new Zernio()
   const content = buildPostContent(product)
-  const rawImageUrl = product.images[0]
 
-  // Asegurar que la imagen cumple el ratio de Instagram (0.8–1.91).
-  // Si no cumple, se recorta automáticamente y se sube una versión corregida.
-  const imageUrl = await ensureInstagramSafeImage(rawImageUrl)
+  // Asegurar que todas las imágenes cumplen el ratio de Instagram (0.8–1.91)
+  const imageUrls = await Promise.all(
+    product.images.map((img) => ensureInstagramSafeImage(img))
+  )
 
   const { data: post } = await zernio.posts.createPost({
     body: {
       content,
-      mediaItems: [
-        {
-          type: 'image',
-          url: imageUrl,
-        },
-      ],
+      mediaItems: imageUrls.map((url) => ({
+        type: 'image',
+        url,
+      })),
       platforms: [
         {
           platform: 'facebook',
