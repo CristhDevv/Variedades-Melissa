@@ -43,6 +43,7 @@ export default function EditarProductoPage() {
   const [urlInput, setUrlInput] = useState('')
 
   // Submit/Delete states
+  const [zernioPostId, setZernioPostId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
@@ -85,6 +86,7 @@ export default function EditarProductoPage() {
       setSizes(p.sizes || [])
       setColors(p.colors || [])
       setExistingImages(p.images || [])
+      setZernioPostId(p.zernio_post_id || null)
       setLoading(false)
     }
 
@@ -197,6 +199,24 @@ export default function EditarProductoPage() {
     setDeleting(true)
 
     try {
+      // 0. Delete post from social media using Zernio before storage cleanup
+      if (zernioPostId) {
+        try {
+          const res = await fetch('/api/social/delete', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ postId: zernioPostId }),
+          })
+          if (!res.ok) {
+            console.error('No se pudo borrar el post de redes sociales a través del endpoint:', await res.text())
+          }
+        } catch (socialErr) {
+          console.error('Error durante la llamada para borrar el post de redes sociales:', socialErr)
+        }
+      }
+
       // 1. Delete images from storage first
       const filesToDelete = existingImages
         .map(url => getStoragePathFromUrl(url))

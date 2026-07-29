@@ -25,6 +25,7 @@ export type Product = {
   meta_title: string | null
   meta_description: string | null
   social_posted: boolean
+  zernio_post_id?: string | null
   created_at: string
   categories?: Category
 }
