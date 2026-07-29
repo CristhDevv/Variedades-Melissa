@@ -47,7 +47,6 @@ export default function EditarProductoPage() {
   const [deleting, setDeleting] = useState(false)
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
-  const [publishToSocial, setPublishToSocial] = useState(false)
 
   useEffect(() => {
     const initData = async () => {
@@ -176,19 +175,6 @@ export default function EditarProductoPage() {
         .eq('id', productId)
 
       if (updateError) throw updateError
-
-      // Call social publish if toggled
-      if (publishToSocial) {
-        try {
-          await fetch('/api/social/publish', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productId })
-          })
-        } catch (socialErr) {
-          console.error('Error al publicar en redes sociales:', socialErr)
-        }
-      }
 
       router.push('/admin/productos')
     } catch (err: any) {
@@ -441,16 +427,6 @@ export default function EditarProductoPage() {
                   style={{ width: 'auto', cursor: 'pointer' }}
                 />
                 Destacado (Inicio)
-              </label>
-
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', fontSize: 13, fontWeight: 500 }}>
-                <input
-                  type="checkbox"
-                  checked={publishToSocial}
-                  onChange={(e) => setPublishToSocial(e.target.checked)}
-                  style={{ width: 'auto', cursor: 'pointer' }}
-                />
-                Publicar en Redes (FB/IG)
               </label>
             </div>
           </div>

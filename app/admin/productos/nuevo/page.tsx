@@ -149,13 +149,13 @@ export default function NuevoProductoPage() {
 
       // 3. Call API route for social post publish
       try {
-        await fetch('/api/social-post', {
+        await fetch('/api/social/publish', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ product: productData })
+          body: JSON.stringify({ productId: productData.id })
         })
-      } catch {
-        // Silently fail if social API is not set up
+      } catch (socialErr) {
+        console.error('Error al publicar en redes sociales:', socialErr)
       }
 
       router.push('/admin/productos')
