@@ -107,6 +107,7 @@ export async function POST(request: Request) {
     }, { status: 200 })
 
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Error interno del servidor' }, { status: 500 })
+    console.error('[/api/social/publish] ERROR:', error?.message, error?.stack, JSON.stringify(error))
+    return NextResponse.json({ error: error.message || 'Error interno del servidor', stack: error?.stack }, { status: 500 })
   }
 }
