@@ -209,7 +209,13 @@ export default function EditarProductoPage() {
             },
             body: JSON.stringify({ postId: zernioPostId }),
           })
-          if (!res.ok) {
+          if (res.ok) {
+            const data = await res.json()
+            if (data.instagram_manual_delete_required) {
+              const urlMsg = data.instagram_url ? `\n\nEnlace del post: ${data.instagram_url}` : ''
+              alert(`${data.message}${urlMsg}`)
+            }
+          } else {
             console.error('No se pudo borrar el post de redes sociales a través del endpoint:', await res.text())
           }
         } catch (socialErr) {

@@ -86,7 +86,10 @@ export async function POST(request: Request) {
     if (socialPostedValue) {
       const { error: updateError } = await supabase
         .from('products')
-        .update({ social_posted: true })
+        .update({
+          social_posted: true,
+          zernio_post_id: postId,
+        })
         .eq('id', productId)
 
       if (updateError) {
