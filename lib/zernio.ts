@@ -72,6 +72,14 @@ export async function publishProductToZernio(product: Product): Promise<string> 
   const content = buildPostContent(product)
   const imageUrl = product.images[0]
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+  const resolvedImageUrl = imageUrl.startsWith('http')
+    ? imageUrl
+    : `${supabaseUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`
+
+  console.log('[Zernio] imageUrl original:', imageUrl)
+  console.log('[Zernio] imageUrl resuelto:', resolvedImageUrl)
+
   const { data: post } = await zernio.posts.createPost({
     body: {
       content,
@@ -79,12 +87,12 @@ export async function publishProductToZernio(product: Product): Promise<string> 
         {
           platform: 'facebook',
           accountId: ZERNIO_FACEBOOK_ACCOUNT_ID,
-          mediaUrls: [imageUrl],
+          mediaUrls: [resolvedImageUrl],
         },
         {
           platform: 'instagram',
           accountId: ZERNIO_INSTAGRAM_ACCOUNT_ID,
-          mediaUrls: [imageUrl],
+          mediaUrls: [resolvedImageUrl],
         },
       ],
       publishNow: true,
