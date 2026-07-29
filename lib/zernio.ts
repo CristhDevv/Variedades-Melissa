@@ -1,5 +1,6 @@
 import Zernio from '@zernio/node'
 import type { Product } from './types'
+import { ensureInstagramSafeImage } from './imageUtils'
 
 // El cliente se inicializa perezosamente dentro de la función de publicación para evitar
 // errores de inicialización en tiempo de compilación cuando la API Key está vacía.
@@ -74,7 +75,11 @@ export async function publishProductToZernio(product: Product): Promise<string> 
 
   const zernio = new Zernio()
   const content = buildPostContent(product)
-  const imageUrl = product.images[0]
+  const rawImageUrl = product.images[0]
+
+  // Asegurar que la imagen cumple el ratio de Instagram (0.8–1.91).
+  // Si no cumple, se recorta automáticamente y se sube una versión corregida.
+  const imageUrl = await ensureInstagramSafeImage(rawImageUrl)
 
   const { data: post } = await zernio.posts.createPost({
     body: {
