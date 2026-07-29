@@ -89,6 +89,9 @@ export async function publishProductToZernio(product: Product): Promise<string> 
         {
           platform: 'instagram',
           accountId: ZERNIO_INSTAGRAM_ACCOUNT_ID,
+          platformSpecificData: {
+            contentType: 'story' as const,
+          },
         },
       ],
       publishNow: true,
