@@ -61,7 +61,7 @@ function buildPostContent(product: Product): string {
  *
  * @param product - Producto con su forma completa definida en lib/types.ts
  */
-export async function publishProductToZernio(product: Product): Promise<void> {
+export async function publishProductToZernio(product: Product): Promise<string> {
   if (!product.images || product.images.length === 0) {
     throw new Error(
       `El producto "${product.name}" no tiene imágenes. No se puede publicar en redes sociales.`
@@ -92,4 +92,5 @@ export async function publishProductToZernio(product: Product): Promise<void> {
   })
 
   console.log('[Zernio] Post publicado exitosamente:', post)
+  return post?.post?._id || ''
 }
