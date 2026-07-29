@@ -31,25 +31,29 @@ function calcDiscountPercent(comparePrice: number, salePrice: number): number {
  * Arma el texto del post a partir de los datos del producto.
  */
 function buildPostContent(product: Product): string {
-  const { name, price, compare_price } = product
+  const { name, price, compare_price, slug } = product
 
   const priceFormatted = formatPriceCOP(price)
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://variedades-melissa.vercel.app')
+    .replace(/\/$/, '')
+  const productUrl = `${siteUrl}/producto/${slug}`
 
   let priceBlock: string
   if (compare_price && compare_price > price) {
     const comparePriceFormatted = formatPriceCOP(compare_price)
     const discountPercent = calcDiscountPercent(compare_price, price)
-    priceBlock = `Antes ${comparePriceFormatted}, ahora ${priceFormatted} (${discountPercent}% OFF) 🏷️`
+    priceBlock = `Antes ${comparePriceFormatted}, ahora ${priceFormatted} (${discountPercent}% OFF) \u{1F3F7}`
   } else {
     priceBlock = priceFormatted
   }
 
   return [
-    `✨ ${name}`,
+    `\u{2728} ${name}`,
     '',
-    `💰 ${priceBlock}`,
+    `\u{1F4B0} ${priceBlock}`,
     '',
-    'Disponible ahora en Variedades Melissa 🛍️',
+    `\u{1F6D2} Disponible en Variedades Melissa:`,
+    productUrl,
   ].join('\n')
 }
 
@@ -89,9 +93,6 @@ export async function publishProductToZernio(product: Product): Promise<string> 
         {
           platform: 'instagram',
           accountId: ZERNIO_INSTAGRAM_ACCOUNT_ID,
-          platformSpecificData: {
-            contentType: 'story' as const,
-          },
         },
       ],
       publishNow: true,
