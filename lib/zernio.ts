@@ -1,14 +1,18 @@
-import Zernio from '@zernio/node'
 import type { Product } from './types'
 import { ensureInstagramSafeImage } from './imageUtils'
 
-// El cliente se inicializa perezosamente dentro de la función de publicación para evitar
-// errores de inicialización en tiempo de compilación cuando la API Key está vacía.
+const ZERNIO_BASE_URL = 'https://api.zernio.com/v1'
 
 // IDs de las cuentas conectadas en el dashboard de Zernio.
-// Se deben completar con los valores reales una vez que las cuentas estén vinculadas.
 const ZERNIO_FACEBOOK_ACCOUNT_ID = process.env.ZERNIO_FACEBOOK_ACCOUNT_ID ?? ''
 const ZERNIO_INSTAGRAM_ACCOUNT_ID = process.env.ZERNIO_INSTAGRAM_ACCOUNT_ID ?? ''
+
+function getZernioHeaders(): HeadersInit {
+  return {
+    'Authorization': `Bearer ${process.env.ZERNIO_API_KEY}`,
+    'Content-Type': 'application/json',
+  }
+}
 
 /**
  * Formatea un número como precio en pesos colombianos (COP).
@@ -59,7 +63,36 @@ function buildPostContent(product: Product): string {
 }
 
 /**
- * Publica un producto en Facebook e Instagram a través de Zernio.
+ * Obtiene el estado de un post de Zernio por su ID.
+ */
+export async function getZernioPost(postId: string): Promise<any> {
+  const res = await fetch(`${ZERNIO_BASE_URL}/posts/${postId}`, {
+    method: 'GET',
+    headers: getZernioHeaders(),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(`Zernio getPost error: ${err?.message ?? res.statusText}`)
+  }
+  return res.json()
+}
+
+/**
+ * Elimina un post de Zernio por su ID.
+ */
+export async function deleteZernioPost(postId: string): Promise<void> {
+  const res = await fetch(`${ZERNIO_BASE_URL}/posts/${postId}`, {
+    method: 'DELETE',
+    headers: getZernioHeaders(),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(`Zernio deletePost error: ${err?.message ?? res.statusText}`)
+  }
+}
+
+/**
+ * Publica un producto en Facebook e Instagram a través de la API REST de Zernio.
  *
  * Requiere que el producto tenga al menos una imagen en el arreglo `images`.
  * Si no hay imágenes, lanza un Error explícito sin publicar.
@@ -73,7 +106,6 @@ export async function publishProductToZernio(product: Product): Promise<string> 
     )
   }
 
-  const zernio = new Zernio({ apiKey: process.env.ZERNIO_API_KEY })
   const content = buildPostContent(product)
 
   // Asegurar que todas las imágenes cumplen el ratio de Instagram (0.8–1.91)
@@ -81,27 +113,30 @@ export async function publishProductToZernio(product: Product): Promise<string> 
     product.images.map((img) => ensureInstagramSafeImage(img))
   )
 
-  const { data: post } = await zernio.posts.createPost({
-    body: {
-      content,
-      mediaItems: imageUrls.map((url) => ({
-        type: 'image',
-        url,
-      })),
-      platforms: [
-        {
-          platform: 'facebook',
-          accountId: ZERNIO_FACEBOOK_ACCOUNT_ID,
-        },
-        {
-          platform: 'instagram',
-          accountId: ZERNIO_INSTAGRAM_ACCOUNT_ID,
-        },
-      ],
-      publishNow: true,
-    },
+  const body = {
+    content,
+    mediaItems: imageUrls.map((url) => ({ type: 'image', url })),
+    platforms: [
+      { platform: 'facebook', accountId: ZERNIO_FACEBOOK_ACCOUNT_ID },
+      { platform: 'instagram', accountId: ZERNIO_INSTAGRAM_ACCOUNT_ID },
+    ],
+    publishNow: true,
+  }
+
+  const res = await fetch(`${ZERNIO_BASE_URL}/posts`, {
+    method: 'POST',
+    headers: getZernioHeaders(),
+    body: JSON.stringify(body),
   })
 
-  console.log('[Zernio] Post publicado exitosamente:', post)
-  return post?.post?._id || ''
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(`Zernio createPost error: ${err?.message ?? res.statusText}`)
+  }
+
+  const data = await res.json()
+  const postId: string = data?.post?._id || ''
+
+  console.log('[Zernio] Post publicado exitosamente:', data?.post)
+  return postId
 }

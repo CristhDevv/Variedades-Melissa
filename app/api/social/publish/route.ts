@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { publishProductToZernio } from '@/lib/zernio'
+import { publishProductToZernio, getZernioPost } from '@/lib/zernio'
 import type { Product } from '@/lib/types'
-import Zernio from '@zernio/node'
 
 export async function POST(request: Request) {
   try {
@@ -47,15 +46,12 @@ export async function POST(request: Request) {
     }
 
     // Polling del estado de las plataformas
-    const zernio = new Zernio({ apiKey: process.env.ZERNIO_API_KEY })
     let attempts = 0
     const maxAttempts = 5 // 5 intentos * 2 segundos = 10 segundos máx
     let finalPost: any = null
 
     while (attempts < maxAttempts) {
-      const { data } = await zernio.posts.getPost({
-        path: { postId }
-      })
+      const data = await getZernioPost(postId)
 
       const platforms = data?.post?.platforms || []
       const allDone = platforms.length > 0 && platforms.every((p: any) =>
@@ -72,9 +68,7 @@ export async function POST(request: Request) {
     }
 
     if (!finalPost) {
-      const { data } = await zernio.posts.getPost({
-        path: { postId }
-      })
+      const data = await getZernioPost(postId)
       finalPost = data?.post
     }
 

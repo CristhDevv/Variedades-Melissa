@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import Zernio from '@zernio/node'
+import { getZernioPost, deleteZernioPost } from '@/lib/zernio'
 
 export async function POST(request: Request) {
   try {
@@ -9,33 +9,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'postId es requerido.' }, { status: 400 })
     }
 
-    const zernio = new Zernio({ apiKey: process.env.ZERNIO_API_KEY })
-
     // 1. Fetch post details to retrieve Instagram URL
     let instagramUrl: string | null = null
     try {
-      const { data: postData } = await zernio.posts.getPost({
-        path: { postId }
-      })
+      const postData = await getZernioPost(postId)
       const instagramPlatform = postData?.post?.platforms?.find((p: any) => p.platform === 'instagram')
       instagramUrl = instagramPlatform?.platformPostUrl || instagramPlatform?.url || null
     } catch (getErr: any) {
       console.error('[/api/social/delete] Error al obtener detalles de post:', getErr?.message)
     }
 
-    // 2. Unpublish Facebook and delete the post record
+    // 2. Delete the post record
     let deleteSuccess = false
     try {
-      await zernio.posts.unpublishPost({
-        path: { postId },
-        body: { platform: 'facebook' }
-      })
-      await zernio.posts.deletePost({
-        path: { postId }
-      })
+      await deleteZernioPost(postId)
       deleteSuccess = true
     } catch (deleteErr: any) {
-      console.error('[/api/social/delete] Error en unpublish/delete:', deleteErr?.message)
+      console.error('[/api/social/delete] Error en delete:', deleteErr?.message)
     }
 
     return NextResponse.json({
@@ -50,4 +40,3 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message || 'Error interno al eliminar el post.' }, { status: 500 })
   }
 }
-
