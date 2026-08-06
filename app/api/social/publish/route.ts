@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     // Polling del estado de las plataformas
-    const zernio = new Zernio()
+    const zernio = new Zernio({ apiKey: process.env.ZERNIO_API_KEY })
     let attempts = 0
     const maxAttempts = 5 // 5 intentos * 2 segundos = 10 segundos máx
     let finalPost: any = null

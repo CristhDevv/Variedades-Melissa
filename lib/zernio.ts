@@ -73,7 +73,7 @@ export async function publishProductToZernio(product: Product): Promise<string> 
     )
   }
 
-  const zernio = new Zernio()
+  const zernio = new Zernio({ apiKey: process.env.ZERNIO_API_KEY })
   const content = buildPostContent(product)
 
   // Asegurar que todas las imágenes cumplen el ratio de Instagram (0.8–1.91)

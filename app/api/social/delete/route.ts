@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'postId es requerido.' }, { status: 400 })
     }
 
-    const zernio = new Zernio()
+    const zernio = new Zernio({ apiKey: process.env.ZERNIO_API_KEY })
 
     // 1. Fetch post details to retrieve Instagram URL
     let instagramUrl: string | null = null
