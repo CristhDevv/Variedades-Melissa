@@ -59,6 +59,8 @@ function buildPostContent(product: Product): string {
     '',
     `\u{1F6D2} Disponible en Variedades Melissa:`,
     productUrl,
+    '',
+    `\u{1F4AC} Escríbenos por WhatsApp: https://wa.me/573233292168`,
   ].join('\n')
 }
 
