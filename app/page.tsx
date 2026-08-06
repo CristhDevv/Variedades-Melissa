@@ -27,12 +27,17 @@ export default async function HomePage() {
     .order('sort_order', { ascending: true })
 
   // Fetch Featured Products (active=true, featured=true, limit 8)
-  const { data: productsData } = await supabase
+  // Fallback: if no featured products exist, show all active products
+  const { data: featuredData } = await supabase
     .from('products')
     .select('*')
     .eq('active', true)
     .eq('featured', true)
     .limit(8)
+
+  const productsData = (featuredData && featuredData.length > 0)
+    ? featuredData
+    : (await supabase.from('products').select('*').eq('active', true).limit(8)).data
 
   const banners = (bannersData || []) as Banner[]
   const categories = (categoriesData || []) as Category[]
